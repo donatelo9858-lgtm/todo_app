@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Мои задачи</h1>
+    <a href="{{ url_for('create_task') }}" class="btn btn-success">+ Новая задача</a>
+</div>
+
+<div class="row">
+    {% for task in tasks %}
+    <div class="col-md-6 mb-3">
+        <div class="card {% if task.status == 'completed' %}bg-light text-muted{% endif %}">
+            <div class="card-body">
+                <h5 class="card-title">{{ task.title }}</h5>
+                <p class="card-text">{{ task.description[:100] }}{% if task.description|length > 100 %}...{% endif %}</p>
+                {% if task.deadline %}
+                <small class="text-muted">Дедлайн: {{ task.deadline.strftime('%d.%m.%Y') }}</small><br>
+                {% endif %}
+                <small class="text-muted">Создано: {{ task.created_at.strftime('%d.%m.%Y') }}</small>
+                <div class="mt-2">
+                    <a href="{{ url_for('view_task', task_id=task.id) }}" class="btn btn-sm btn-info">Подробнее</a>
+                    {% if task.status != 'completed' %}
+                    <a href="{{ url_for('complete_task', task_id=task.id) }}" class="btn btn-sm btn-success">✓ Выполнить</a>
+                    {% endif %}
+                    <a href="{{ url_for('delete_task', task_id=task.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Удалить?')">🗑 Удалить</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col">
+        <div class="alert alert-info">Нет задач. Создайте первую!</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

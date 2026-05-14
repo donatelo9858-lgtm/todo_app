@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mb-3">
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">← Назад</a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2>{% if task %}Задача #{{ task.id }}{% else %}Новая задача{% endif %}</h2>
+    </div>
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label>Название</label>
+                <input type="text" name="title" class="form-control" value="{{ task.title if task else '' }}" required>
+            </div>
+            <div class="mb-3">
+                <label>Описание</label>
+                <textarea name="description" class="form-control" rows="5">{{ task.description if task else '' }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label>Дедлайн</label>
+                <input type="date" name="deadline" class="form-control" value="{{ task.deadline.strftime('%Y-%m-%d') if task and task.deadline else '' }}">
+            </div>
+            {% if not task %}
+            <div class="mb-3">
+                <label>Прикрепить файл</label>
+                <input type="file" name="file" class="form-control">
+            </div>
+            {% endif %}
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+        </form>
+
+        {% if task %}
+        <hr>
+        <h4>Прикреплённые файлы</h4>
+        {% if task.files %}
+        <ul class="list-group mb-3">
+            {% for file in task.files %}
+            <li class="list-group-item">
+                📎 {{ file.filename }}
+                <a href="{{ url_for('uploaded_file', filename=file.filepath) }}" class="btn btn-sm btn-link" download>Скачать</a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>Нет файлов</p>
+        {% endif %}
+
+        <form action="{{ url_for('add_file', task_id=task.id) }}" method="POST" enctype="multipart/form-data" class="mt-3">
+            <div class="input-group">
+                <input type="file" name="file" class="form-control" required>
+                <button type="submit" class="btn btn-secondary">Добавить файл</button>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
